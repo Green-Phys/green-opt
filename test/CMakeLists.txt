@@ -1,4 +1,4 @@
-project(_test)
+project(opt_test)
 
 Include(FetchContent)
 
@@ -11,12 +11,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 
-add_executable(_test )
-target_link_libraries(_test
+add_executable(opt_test opt_test.cpp)
+target_link_libraries(opt_test
         PRIVATE
         Catch2::Catch2WithMain
-        GREEN::<>)
+        GREEN::OPT)
 
 include(CTest)
 include(Catch)
-catch_discover_tests(_test)
+catch_discover_tests(opt_test)
