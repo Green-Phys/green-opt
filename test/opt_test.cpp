@@ -69,7 +69,7 @@ TEST_CASE("DIIS") {
   Vector vec_prev = vec_0;
   Vector vec_new{0, 0, 0};
   Vector solution{0.28571428571428571429, 0.21428571428571428571, 0.21428571428571428571};
-  diis.init(5, 1.0);
+  diis.init(4, 1.0);
   int N_iter = 200;
   for (int i = 0; i < N_iter; ++i) {
     solver.solve(vec_prev, vec_new);

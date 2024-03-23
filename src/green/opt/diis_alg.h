@@ -247,13 +247,11 @@ namespace green::opt {
 #if DIIS_DEBUG
       print_B();
 #endif
-
-#pragma float_control(precise, on)  // Need accurate extrapolation coeffs
       MatrixXcd            B  = _m_B.real();
-
       VectorXcd            bb = VectorXcd::Constant(B.cols(), 1.0);
 
-      VectorXcd            x  = B.bdcSvd(Eigen::ComputeFullU | Eigen::ComputeFullV).solve(bb);
+      Eigen::FullPivLU<MatrixXcd> solver(B);
+      VectorXcd            x  = solver.solve(bb);
       std::complex<double> sum(0.0, 0.0);
       for (size_t i = 0; i < B.rows(); i++) {
         sum += x[i];
