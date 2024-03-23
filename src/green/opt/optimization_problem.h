@@ -22,7 +22,7 @@
 #ifndef GREEN_OPT_OPTIMIZATION_PROBLEM
 #define GREEN_OPT_OPTIMIZATION_PROBLEM
 
-namespace mbpt::opt {
+namespace green::opt {
 
   /** \brief Basic optimization problem
    *
@@ -38,16 +38,12 @@ namespace mbpt::opt {
     Vector m_x;
 
   public:
-    optimization_problem() {}
+                  optimization_problem() : iter(0) {}
 
-    Vector  get_x() && { return m_x; }
-
-    Vector& get_x() & { return m_x; }  // l-value version
-
-    void    get_x(Vector& vec) { vec = m_x; }
-
-    void    put_x(const Vector& vec) { m_x = vec; }
+    Vector        x() && { return m_x; }
+    Vector&       x() & { return m_x; }       // l-value version
+    const Vector& x() const& { return m_x; }  // l-value const version
   };
-}  // namespace opt
+}  // namespace green::opt
 
 #endif  // GREEN_OPT_OPTIMIZATION_PROBLEM

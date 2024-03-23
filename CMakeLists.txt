@@ -23,6 +23,10 @@ endif ()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+include(GreenDeps)
+
+add_green_dependency(green-utils)
+
 add_subdirectory(src)
 add_library(GREEN::OPT ALIAS opt)
 
