@@ -20,7 +20,6 @@
  */
 
 #include <green/opt/diis_alg.h>
-#include <green/opt/diis_residual.h>
 
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
