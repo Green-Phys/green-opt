@@ -66,15 +66,31 @@ TEST_CASE("DIIS") {
   };
   // green::opt::diis_residual<VS::Vector>();
   Vector vec_0{0.5, 1, 0.5};
-  Vector vec_prev = vec_0;
-  Vector vec_new{0, 0, 0};
   Vector solution{0.28571428571428571429, 0.21428571428571428571, 0.21428571428571428571};
-  int N_iter = 200;
-  for (int i = 0; i < N_iter; ++i) {
-    solver.solve(vec_prev, vec_new);
-    diis.next_step(vec_new, x_vsp, res_vsp, residual, problem);
-    vec_prev = problem.x();
+  SECTION("TEST C1") {
+    Vector vec_prev = vec_0;
+    Vector vec_new{0, 0, 0};
+    int N_iter = 200;
+    for (int i = 0; i < N_iter; ++i) {
+      solver.solve(vec_prev, vec_new);
+      diis.next_step(vec_new, x_vsp, res_vsp, residual, problem);
+      vec_prev = problem.x();
+    }
+    REQUIRE(std::equal(problem.x().begin(), problem.x().end(), solution.begin(),
+                       [](const std::complex<double>& x, const std::complex<double>& s) { return std::abs(x - s) < 1e-7;}));
   }
-  REQUIRE(std::equal(problem.x().begin(), problem.x().end(), solution.begin(),
-                     [](const std::complex<double>& x, const std::complex<double>& s) { return std::abs(x - s) < 1e-7;}));
+  SECTION("TEST C2") {
+    Vector vec_prev = vec_0;
+    Vector vec_new{0, 0, 0};
+    int N_iter = 200;
+    for (int i = 0; i < N_iter; ++i) {
+      solver.solve(vec_prev, vec_new);
+      diis.next_step(vec_new, x_vsp, res_vsp, residual, problem, green::opt::lagrangian_type::C2);
+      vec_prev = problem.x();
+    }
+    REQUIRE(std::equal(problem.x().begin(), problem.x().end(), solution.begin(),
+                       [](const std::complex<double>& x, const std::complex<double>& s) { return std::abs(x - s) < 1e-7;}));
+  }
+
+
 }

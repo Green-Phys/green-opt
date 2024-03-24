@@ -108,7 +108,8 @@ namespace green::opt {
     }
 
     template <typename VS, typename Res>
-    void next_step(Vector& vec, VS& x_vsp, VS& res_vsp, Res& residual, optimization_problem<Vector>& problem) {
+    void next_step(Vector& vec, VS& x_vsp, VS& res_vsp, Res& residual, optimization_problem<Vector>& problem,
+                   const lagrangian_type& type = lagrangian_type::C1) {
       if (x_vsp.size() <= _min_subsp_size) {
         std::cout << diis_str << "Growing subspace without extrapolation\n";
         x_vsp.add(vec);
@@ -133,7 +134,7 @@ namespace green::opt {
       res_vsp.add(res);
       x_vsp.add(vec);
       if (res_vsp.size() > 1) {
-        compute_coefs(lagrangian_type::C1);
+        compute_coefs(type);
 
         if (!utils::context.global_rank) std::cout << diis_str << "Performing the DIIS extrapolation..." << std::endl;
         if (!utils::context.global_rank) print_B();
@@ -263,7 +264,7 @@ namespace green::opt {
 
       Eigen::BDCSVD       svd(B, Eigen::ComputeFullU | Eigen::ComputeFullV);
       MatrixXcd           U         = svd.matrixU();
-      VectorXcd           sing_vals = svd.singularValues().asDiagonal();
+      VectorXcd           sing_vals = svd.singularValues();
       std::vector<double> errors(B.cols());
 
       // Normalize columns such that sum_i c_i = 1
