@@ -51,7 +51,7 @@ TEST_CASE("DIIS") {
   Vector                       A = {5, -1, -1, -1, 5, 1, -1, 1, 5};
   Vector                       B = {1, 1, 1};
   linear_iterative_solver      solver(A, B);
-  green::opt::diis_alg<Vector> diis;
+  green::opt::diis_alg<Vector> diis(2, 5);
   VS                           x_vsp;
   VS                           res_vsp;
   problem_type                 problem;
@@ -69,7 +69,6 @@ TEST_CASE("DIIS") {
   Vector vec_prev = vec_0;
   Vector vec_new{0, 0, 0};
   Vector solution{0.28571428571428571429, 0.21428571428571428571, 0.21428571428571428571};
-  diis.init(4, 1.0);
   int N_iter = 200;
   for (int i = 0; i < N_iter; ++i) {
     solver.solve(vec_prev, vec_new);

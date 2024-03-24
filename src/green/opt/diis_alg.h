@@ -76,8 +76,8 @@ namespace green::opt {
     const std::string diis_str{"DIIS: "};
 
   public:
-    explicit diis_alg(size_t min_subsp_size = 1, size_t max_subsp_size = 10) :
-        _min_subsp_size(min_subsp_size), _max_subsp_size(max_subsp_size) {}
+    explicit diis_alg(size_t min_subsp_size = 1, size_t max_subsp_size = 10, double trust_norm = 1.0) :
+        iterative_optimizer<Vector, diis_alg>(trust_norm), _min_subsp_size(min_subsp_size), _max_subsp_size(max_subsp_size) {}
 
     double get_err_norm() {
       size_t dim = _m_B.cols();
@@ -106,14 +106,6 @@ namespace green::opt {
       std::cout << diis_str << "Extrapolation coefs: " << std::endl;
       std::cout << _m_C << std::endl;
     }
-
-    void init(size_t max_subsp_size, double trust) {
-      _max_subsp_size = max_subsp_size;
-      trust_norm()    = trust;
-#if DIIS_DEBUG
-      if (!!utils::context.global_rank) print_B();
-#endif
-    };
 
     template <typename VS, typename Res>
     void next_step(Vector& vec, VS& x_vsp, VS& res_vsp, Res& residual, optimization_problem<Vector>& problem) {
@@ -247,12 +239,12 @@ namespace green::opt {
 #if DIIS_DEBUG
       print_B();
 #endif
-      MatrixXcd            B  = _m_B.real();
-      VectorXcd            bb = VectorXcd::Constant(B.cols(), 1.0);
+      MatrixXcd                   B  = _m_B.real();
+      VectorXcd                   bb = VectorXcd::Constant(B.cols(), 1.0);
 
       Eigen::FullPivLU<MatrixXcd> solver(B);
-      VectorXcd            x  = solver.solve(bb);
-      std::complex<double> sum(0.0, 0.0);
+      VectorXcd                   x = solver.solve(bb);
+      std::complex<double>        sum(0.0, 0.0);
       for (size_t i = 0; i < B.rows(); i++) {
         sum += x[i];
       }

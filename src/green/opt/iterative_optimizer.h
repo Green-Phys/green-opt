@@ -35,12 +35,11 @@ namespace green::opt {
   template <typename Vector, typename Derived>
   class iterative_optimizer {
   protected:
-    size_t _iter;
     double _trust_norm;  // limit of the coef vector norm
 
   public:
     virtual ~iterative_optimizer() = default;
-             iterative_optimizer() : _iter(0), _trust_norm{1.0} {}
+    explicit iterative_optimizer(double trust_norm = 1.0) : _trust_norm(trust_norm) {}
     /**
      * Process vector for the next step of converegence acceleration.
      *
@@ -60,6 +59,6 @@ namespace green::opt {
     [[nodiscard]] double trust_norm() const { return _trust_norm; }
     double&              trust_norm() { return _trust_norm; }
   };
-}  // namespace mbpt::opt
+}  // namespace green::opt
 
 #endif  // GREEN_OPT_ITERATIVE_OPTIMIZER
