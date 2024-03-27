@@ -34,15 +34,16 @@ namespace green::opt {
   template <typename Vector>
   class optimization_problem {
   protected:
-    size_t iter;
-    Vector m_x;
+    size_t _iter;
+    Vector _m_x;
 
   public:
-                  optimization_problem() : iter(0) {}
+                  optimization_problem() : _iter(0) {}
+    explicit      optimization_problem(const Vector& m_x) : _iter(0), _m_x(m_x) {}
 
-    Vector        x() && { return m_x; }
-    Vector&       x() & { return m_x; }       // l-value version
-    const Vector& x() const& { return m_x; }  // l-value const version
+    Vector        x() && { return _m_x; }
+    Vector&       x() & { return _m_x; }       // l-value version
+    const Vector& x() const& { return _m_x; }  // l-value const version
   };
 }  // namespace green::opt
 
