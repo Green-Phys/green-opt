@@ -55,41 +55,39 @@ TEST_CASE("DIIS") {
   VS                           x_vsp;
   VS                           res_vsp;
   problem_type                 problem;
-  auto                         residual = [](Vector& res, VS& x_vsp, problem_type& problem) -> bool {
-    if (x_vsp.size() >= 2) {
-      Vector last;
-      x_vsp.get(x_vsp.size() - 1, last);
-      green::opt::add(res, problem.x(), last, std::complex<double>(-1.0, 0.0));  // vec - x_vsp.get_vec(vsp.size()-1);
-      return true;
-    }
-    return false;
+  auto                         residual = [](VS& x_vsp, problem_type& problem) -> Vector {
+    Vector last;
+    x_vsp.get(x_vsp.size() - 1, last);
+    Vector res(last);
+    green::opt::add(res, problem.x(), last, std::complex<double>(-1.0, 0.0));  // vec - x_vsp.get_vec(vsp.size()-1);
+    return res;
   };
   // green::opt::diis_residual<VS::Vector>();
   Vector vec_0{0.5, 1, 0.5};
   Vector solution{0.28571428571428571429, 0.21428571428571428571, 0.21428571428571428571};
-  SECTION("TEST C1") {
+         SECTION("TEST C1") {
     Vector vec_prev = vec_0;
     Vector vec_new{0, 0, 0};
-    int N_iter = 200;
+    int    N_iter = 200;
     for (int i = 0; i < N_iter; ++i) {
       solver.solve(vec_prev, vec_new);
       diis.next_step(vec_new, x_vsp, res_vsp, residual, problem);
       vec_prev = problem.x();
     }
     REQUIRE(std::equal(problem.x().begin(), problem.x().end(), solution.begin(),
-                       [](const std::complex<double>& x, const std::complex<double>& s) { return std::abs(x - s) < 1e-7;}));
+                              [](const std::complex<double>& x, const std::complex<double>& s) { return std::abs(x - s) < 1e-7; }));
   }
   SECTION("TEST C2") {
     Vector vec_prev = vec_0;
     Vector vec_new{0, 0, 0};
-    int N_iter = 200;
+    int    N_iter = 200;
     for (int i = 0; i < N_iter; ++i) {
       solver.solve(vec_prev, vec_new);
       diis.next_step(vec_new, x_vsp, res_vsp, residual, problem, green::opt::lagrangian_type::C2);
       vec_prev = problem.x();
     }
     REQUIRE(std::equal(problem.x().begin(), problem.x().end(), solution.begin(),
-                       [](const std::complex<double>& x, const std::complex<double>& s) { return std::abs(x - s) < 1e-7;}));
+                       [](const std::complex<double>& x, const std::complex<double>& s) { return std::abs(x - s) < 1e-7; }));
   }
 
 

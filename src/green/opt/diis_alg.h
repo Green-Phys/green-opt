@@ -125,10 +125,7 @@ namespace green::opt {
         purge_overlap(0);
       }
       problem.x() = vec;
-      Vector res;
-      if (!residual(res, x_vsp, problem)) {
-        if (!utils::context.global_rank) std::cout << diis_str << "Could not get residual!!! ABORT!" << std::endl;
-      }
+      Vector res = residual(x_vsp, problem);
       // TODO: treat linear deps
       update_overlaps(res, res_vsp);
       res_vsp.add(res);
