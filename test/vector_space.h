@@ -60,11 +60,11 @@ namespace green::opt {
 
     void                 purge(size_t k) { m_dbase.erase(m_dbase.begin() + k); }
 
-    Vector               make_linear_comb(const Eigen::VectorXcd& C) {
+    void               make_linear_comb(const Eigen::VectorXcd& C, Vector& r) {
       if (m_dbase.size() == 0) {
-        return {0, 0.0};
+        return;
       }
-      Vector r(m_dbase[0].size(), 0);
+      std::fill(r.begin(), r.end(), 0);
       for (size_t i = 0; i < m_dbase.size() && i < C.size(); i++) {
         Vector               vec_i = get(size() - 1 - i);
         std::complex<double> coeff = C(C.size() - 1 - i);
@@ -72,7 +72,6 @@ namespace green::opt {
         std::transform(vec_i.begin(), vec_i.end(), r.begin(), r.begin(),
                                      [](const std::complex<double>& x, const std::complex<double>& y) { return x + y; });
       }
-      return r;
     }
 
   private:

@@ -108,7 +108,7 @@ namespace green::opt {
     }
 
     template <typename VS, typename Res, typename problem_t = optimization_problem<Vector>>
-    void next_step(Vector& vec, VS& x_vsp, VS& res_vsp, Res& residual, problem_t& problem,
+    void next_step(Vector& vec, Vector& res, VS& x_vsp, VS& res_vsp, Res& residual, problem_t& problem,
                    const lagrangian_type& type = lagrangian_type::C1) {
       if (x_vsp.size() <= _min_subsp_size) {
         std::cout << diis_str << "Growing subspace without extrapolation\n";
@@ -125,7 +125,7 @@ namespace green::opt {
         purge_overlap(0);
       }
       problem.x() = vec;
-      Vector res  = residual(x_vsp, problem);
+      residual(x_vsp, problem, res);
       // TODO: treat linear deps
       update_overlaps(res, res_vsp);
       res_vsp.add(res);
@@ -137,8 +137,7 @@ namespace green::opt {
         if (!utils::context.global_rank) print_B();
         if (!utils::context.global_rank)
           std::cout << diis_str << "Predicted extrapol (e,e) = " << _m_C.dot(_m_B * _m_C) << std::endl;
-        Vector result = x_vsp.make_linear_comb(_m_C);
-        problem.x()   = result;
+        x_vsp.make_linear_comb(_m_C, problem.x());
       } else {
         problem.x() = vec;
       }
