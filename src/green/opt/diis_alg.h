@@ -111,10 +111,9 @@ namespace green::opt {
     void next_step(Vector& vec, Vector& res, VS& x_vsp, VS& res_vsp, Res& residual, problem_t& problem,
                    const lagrangian_type& type = lagrangian_type::C1) {
       if (x_vsp.size() <= _min_subsp_size) {
-        std::cout << diis_str << "Growing subspace without extrapolation\n";
+        if (!utils::context.global_rank) std::cout << diis_str << "Growing subspace without extrapolation\n";
       }
       if (x_vsp.size() == 0) {
-        std::cout << diis_str << "Growing subspace without extrapolation\n";
         x_vsp.add(vec);
         problem.x() = vec;
         return;
