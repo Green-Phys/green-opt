@@ -51,7 +51,7 @@ TEST_CASE("DIIS") {
   Vector                       A = {5, -1, -1, -1, 5, 1, -1, 1, 5};
   Vector                       B = {1, 1, 1};
   linear_iterative_solver      solver(A, B);
-  green::opt::diis_alg<Vector> diis(2, 5);
+  green::opt::diis_alg<Vector> diis(2, 5, 3);
   VS                           x_vsp;
   VS                           res_vsp;
   problem_type                 problem;

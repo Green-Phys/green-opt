@@ -73,11 +73,21 @@ namespace green::opt {
     VectorXcd         _m_C;  // Vector of extrapolation coefs
     size_t            _min_subsp_size;
     size_t            _max_subsp_size;
+    int               _verbose;
     const std::string diis_str{"DIIS: "};
 
   public:
-    explicit diis_alg(size_t min_subsp_size = 1, size_t max_subsp_size = 10, double trust_norm = 1.0) :
-        iterative_optimizer<Vector, diis_alg>(trust_norm), _min_subsp_size(min_subsp_size), _max_subsp_size(max_subsp_size) {}
+    /**
+     * 
+     * @param min_subsp_size minimal size of the subspace to start extrapolation
+     * @param max_subsp_size maximum size of extrapolation subspace
+     * @param verbose print verbosicty (0 - do not print, 1 - print stage and extrapolation coefficients,
+     *        2 - print overlap matrix condition number, 3 - print overlap matrix
+     * @param trust_norm trust norm
+     */
+    explicit diis_alg(size_t min_subsp_size = 1, size_t max_subsp_size = 10, int verbose = 1, double trust_norm = 1.0) :
+        iterative_optimizer<Vector, diis_alg>(trust_norm), _min_subsp_size(min_subsp_size), _max_subsp_size(max_subsp_size),
+        _verbose(verbose) {}
 
     double get_err_norm() {
       size_t dim = _m_B.cols();
@@ -97,12 +107,12 @@ namespace green::opt {
       }
     }
 
-    void print_B() {
+    void print_B() const {
       std::cout << diis_str << "m_B:" << std::endl;
       std::cout << _m_B << std::endl;
     }
 
-    void print_C() {
+    void print_C() const {
       std::cout << diis_str << "Extrapolation coefs: " << std::endl;
       std::cout << _m_C << std::endl;
     }
@@ -111,7 +121,7 @@ namespace green::opt {
     void next_step(Vector& vec, Vector& res, VS& x_vsp, VS& res_vsp, Res& residual, problem_t& problem,
                    const lagrangian_type& type = lagrangian_type::C1) {
       if (x_vsp.size() <= _min_subsp_size) {
-        if (!utils::context.global_rank) std::cout << diis_str << "Growing subspace without extrapolation\n";
+        if (!utils::context.global_rank && _verbose >= 1) std::cout << diis_str << "Growing subspace without extrapolation\n";
       }
       if (x_vsp.size() == 0) {
         x_vsp.add(vec);
@@ -120,7 +130,7 @@ namespace green::opt {
       }
       // Normal execution
       if (res_vsp.size() == _max_subsp_size) {
-        if (!utils::context.global_rank)
+        if (!utils::context.global_rank && _verbose >= 2)
           std::cout << diis_str << "Reached maximum subspace. The first vector will be kicked out of the subspace." << std::endl;
         res_vsp.purge(0);  // can do it smarter and purge the one with the smallest coef
         x_vsp.purge(0);
@@ -134,11 +144,13 @@ namespace green::opt {
       res_vsp.add(res);
       if (res_vsp.size() > _min_subsp_size) {
         compute_coefs(type);
+        auto coeff = _m_C.dot(_m_B * _m_C);
+        if (!utils::context.global_rank && _verbose >= 1)
+          std::cout << diis_str << "Performing the DIIS extrapolation..." << std::endl;
+        if (!utils::context.global_rank && _verbose >= 3) print_B();
+        if (!utils::context.global_rank && _verbose >= 3)
+          std::cout << diis_str << "Predicted extrapol (e,e) = " << coeff << std::endl;
 
-        if (!utils::context.global_rank) std::cout << diis_str << "Performing the DIIS extrapolation..." << std::endl;
-        if (!utils::context.global_rank) print_B();
-        if (!utils::context.global_rank)
-          std::cout << diis_str << "Predicted extrapol (e,e) = " << _m_C.dot(_m_B * _m_C) << std::endl;
         x_vsp.make_linear_comb(_m_C, problem.x());
       }
     }
@@ -218,8 +230,8 @@ namespace green::opt {
         default:
           compute_coefs_c1();
       }
-      if (!utils::context.global_rank) print_cond();
-      if (!utils::context.global_rank) print_C();
+      if (!utils::context.global_rank && _verbose >= 2) print_cond();
+      if (!utils::context.global_rank && _verbose >= 1) print_C();
     }
 
     /**
@@ -228,7 +240,7 @@ namespace green::opt {
     void print_cond() const {
       Eigen::JacobiSVD svd(_m_B);
       double           cond = svd.singularValues()(0) / svd.singularValues()(svd.singularValues().size() - 1);
-      if (!utils::context.global_rank)
+      if (!utils::context.global_rank && _verbose >= 2)
         std::cout << diis_str << "Condition number of the residual overlap matrix: " << cond << std::endl;
     }
 
