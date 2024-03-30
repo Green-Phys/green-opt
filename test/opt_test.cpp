@@ -67,7 +67,7 @@ TEST_CASE("DIIS") {
     Vector vec_prev = vec_0;
     Vector vec_new{0, 0, 0};
     Vector vec_res{0, 0, 0};
-    int    N_iter = 200;
+    int    N_iter = 100;
     for (int i = 0; i < N_iter; ++i) {
       solver.solve(vec_prev, vec_new);
       diis.next_step(vec_new, vec_res, x_vsp, res_vsp, residual, problem);

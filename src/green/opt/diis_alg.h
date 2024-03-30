@@ -112,6 +112,9 @@ namespace green::opt {
                    const lagrangian_type& type = lagrangian_type::C1) {
       if (x_vsp.size() <= _min_subsp_size) {
         std::cout << diis_str << "Growing subspace without extrapolation\n";
+      }
+      if (x_vsp.size() == 0) {
+        std::cout << diis_str << "Growing subspace without extrapolation\n";
         x_vsp.add(vec);
         problem.x() = vec;
         return;
@@ -128,9 +131,9 @@ namespace green::opt {
       residual(x_vsp, problem, res);
       // TODO: treat linear deps
       update_overlaps(res, res_vsp);
-      res_vsp.add(res);
       x_vsp.add(vec);
-      if (res_vsp.size() > 1) {
+      res_vsp.add(res);
+      if (res_vsp.size() > _min_subsp_size) {
         compute_coefs(type);
 
         if (!utils::context.global_rank) std::cout << diis_str << "Performing the DIIS extrapolation..." << std::endl;
@@ -138,8 +141,6 @@ namespace green::opt {
         if (!utils::context.global_rank)
           std::cout << diis_str << "Predicted extrapol (e,e) = " << _m_C.dot(_m_B * _m_C) << std::endl;
         x_vsp.make_linear_comb(_m_C, problem.x());
-      } else {
-        problem.x() = vec;
       }
     }
 
