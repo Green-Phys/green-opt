@@ -78,7 +78,7 @@ namespace green::opt {
 
   public:
     /**
-     * 
+     *
      * @param min_subsp_size minimal size of the subspace to start extrapolation
      * @param max_subsp_size maximum size of extrapolation subspace
      * @param verbose print verbosicty (0 - do not print, 1 - print stage and extrapolation coefficients,
@@ -240,6 +240,10 @@ namespace green::opt {
     void print_cond() const {
       Eigen::JacobiSVD svd(_m_B);
       double           cond = svd.singularValues()(0) / svd.singularValues()(svd.singularValues().size() - 1);
+      if (!utils::context.global_rank && std::abs(cond) > 1e+12) {
+        std::cerr << diis_str << "Condition number of the residual overlap matrix is too large: " << cond << std::endl;
+        std::cerr << diis_str << "Consider switching to alternative convergence strategy." << std::endl;
+      }
       if (!utils::context.global_rank && _verbose >= 2)
         std::cout << diis_str << "Condition number of the residual overlap matrix: " << cond << std::endl;
     }
