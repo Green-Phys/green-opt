@@ -120,7 +120,7 @@ namespace green::opt {
     template <typename VS, typename Res, typename problem_t = optimization_problem<Vector>>
     void next_step(Vector& vec, Vector& res, VS& x_vsp, VS& res_vsp, Res& residual, problem_t& problem,
                    const lagrangian_type& type = lagrangian_type::C1) {
-      if (x_vsp.size() <= _min_subsp_size) {
+      if (x_vsp.size() < _min_subsp_size) {
         if (!utils::context.global_rank && _verbose >= 1) std::cout << diis_str << "Growing subspace without extrapolation\n";
       }
       if (x_vsp.size() == 0) {
@@ -142,7 +142,7 @@ namespace green::opt {
       update_overlaps(res, res_vsp);
       x_vsp.add(vec);
       res_vsp.add(res);
-      if (res_vsp.size() > _min_subsp_size) {
+      if (res_vsp.size() >= _min_subsp_size) {
         compute_coefs(type);
         auto coeff = _m_C.dot(_m_B * _m_C);
         if (!utils::context.global_rank && _verbose >= 1)
