@@ -67,7 +67,7 @@ TEST_CASE("DIIS") {
     Vector vec_prev = vec_0;
     Vector vec_new{0, 0, 0};
     Vector vec_res{0, 0, 0};
-    int    N_iter = 100;
+    int    N_iter = 50;
     for (int i = 0; i < N_iter; ++i) {
       solver.solve(vec_prev, vec_new);
       diis.next_step(vec_new, vec_res, x_vsp, res_vsp, residual, problem);
@@ -80,7 +80,7 @@ TEST_CASE("DIIS") {
     Vector vec_prev = vec_0;
     Vector vec_new{0, 0, 0};
     Vector vec_res{0, 0, 0};
-    int    N_iter = 200;
+    int    N_iter = 50;
     for (int i = 0; i < N_iter; ++i) {
       solver.solve(vec_prev, vec_new);
       diis.next_step(vec_new, vec_res, x_vsp, res_vsp, residual, problem, green::opt::lagrangian_type::C2);
@@ -88,6 +88,22 @@ TEST_CASE("DIIS") {
     }
     REQUIRE(std::equal(problem.x().begin(), problem.x().end(), solution.begin(),
                        [](const std::complex<double>& x, const std::complex<double>& s) { return std::abs(x - s) < 1e-7; }));
+  }
+
+  SECTION("REINIT") {
+    Vector vec_prev = vec_0;
+    Vector vec_new{0, 0, 0};
+    Vector vec_res{0, 0, 0};
+    int    N_iter = 10;
+    for (int i = 0; i < N_iter; ++i) {
+      solver.solve(vec_prev, vec_new);
+      diis.next_step(vec_new, vec_res, x_vsp, res_vsp, residual, problem, green::opt::lagrangian_type::C2);
+      vec_prev = problem.x();
+    }
+    green::opt::diis_alg<Vector> diis_2(2, 5, 3);
+    REQUIRE_FALSE(std::abs(diis.get_err_norm() - diis_2.get_err_norm()) < 1e-12);
+    diis_2.reinit(res_vsp);
+    REQUIRE(std::abs(diis.get_err_norm() - diis_2.get_err_norm()) < 1e-12);
   }
 
 

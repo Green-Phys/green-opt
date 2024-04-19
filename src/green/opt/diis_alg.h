@@ -89,10 +89,28 @@ namespace green::opt {
         iterative_optimizer<Vector, diis_alg>(trust_norm), _min_subsp_size(min_subsp_size), _max_subsp_size(max_subsp_size),
         _verbose(verbose) {}
 
+    /**
+     * Reinitialize DIIS optimizer from existing residual vector subspaces
+     *
+     * @tparam VS - vector subspace type
+     * @param res_vsp - vector subspace of residual values
+     */
+    template <typename VS>
+    void reinit(VS& res_vsp) {
+      _m_B.resize(res_vsp.size(), res_vsp.size());
+      for (size_t i = 0; i < _m_B.cols(); ++i) {
+        _m_B(i, i) = res_vsp.overlap(i, i);
+        for(size_t j = i + 1; j < _m_B.rows(); ++j) {
+          _m_B(i, j) = res_vsp.overlap(i, j);
+          _m_B(j, i) = std::conj(_m_B(i, j));
+        }
+      }
+    }
+
     double get_err_norm() {
       size_t dim = _m_B.cols();
       if (dim == 0) {
-        if (!!utils::context.global_rank) std::cout << diis_str << "The error matrix has zero dimension" << std::endl;
+        if (!utils::context.global_rank) std::cout << diis_str << "The error matrix has zero dimension" << std::endl;
         return 1.0;
       }
       return std::sqrt(std::abs(_m_B(dim - 1, dim - 1)));
