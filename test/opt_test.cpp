@@ -106,5 +106,21 @@ TEST_CASE("DIIS") {
     REQUIRE(std::abs(diis.get_err_norm() - diis_2.get_err_norm()) < 1e-12);
   }
 
+  SECTION("INVALIDATE") {
+    Vector vec_prev = vec_0;
+    Vector vec_new{0, 0, 0};
+    Vector vec_res{0, 0, 0};
+    int    N_iter = 10;
+    for (int i = 0; i < N_iter; ++i) {
+      solver.solve(vec_prev, vec_new);
+      diis.next_step(vec_new, vec_res, x_vsp, res_vsp, residual, problem, green::opt::lagrangian_type::C2);
+      vec_prev = problem.x();
+    }
+    REQUIRE(diis.size() != 0);
+    diis.invalidate();
+    REQUIRE(diis.size() == 0);
+
+  }
+
 
 }

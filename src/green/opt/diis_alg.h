@@ -71,8 +71,8 @@ namespace green::opt {
 
     MatrixXcd         _m_B;  // Overlap matrix of the residuals
     VectorXcd         _m_C;  // Vector of extrapolation coefs
-    size_t            _min_subsp_size;
-    size_t            _max_subsp_size;
+    const size_t      _min_subsp_size;
+    const size_t      _max_subsp_size;
     int               _verbose;
     const std::string diis_str{"DIIS: "};
 
@@ -100,7 +100,7 @@ namespace green::opt {
       _m_B.resize(res_vsp.size(), res_vsp.size());
       for (size_t i = 0; i < _m_B.cols(); ++i) {
         _m_B(i, i) = res_vsp.overlap(i, i);
-        for(size_t j = i + 1; j < _m_B.rows(); ++j) {
+        for (size_t j = i + 1; j < _m_B.rows(); ++j) {
           _m_B(i, j) = res_vsp.overlap(i, j);
           _m_B(j, i) = std::conj(_m_B(i, j));
         }
@@ -133,6 +133,16 @@ namespace green::opt {
     void print_C() const {
       std::cout << diis_str << "Extrapolation coefs: " << std::endl;
       std::cout << _m_C << std::endl;
+    }
+
+    /**
+     * @return current size of the DIIS space
+     */
+    [[nodiscard]] size_t size() const { return _m_B.cols(); }
+
+    void                 invalidate() {
+      _m_B.resize(0, 0);
+      _m_C.resize(0);
     }
 
     template <typename VS, typename Res, typename problem_t = optimization_problem<Vector>>
