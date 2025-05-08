@@ -12,23 +12,19 @@ jobs:
     strategy:
       fail-fast: false
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v4
 
     - name: Build
-      run: |
-        pwd
-        printenv
-        whoami
-        
-        module load BuildEnv/gcc-12.2.0.lua;
+      run: |        
+        sudo apt-get update
+
         mkdir build;
         cd build;
         cmake -DCMAKE_CXX_FLAGS=" --coverage -fno-inline -fno-inline-small-functions -fno-default-inline -fprofile-arcs -ftest-coverage " .. ;
-        make -j 4;
-        # TODO add build statge for project
+        make -j4;
 
     - name: Test
       run: |
