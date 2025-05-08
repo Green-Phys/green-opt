@@ -23,6 +23,7 @@ jobs:
         sudo apt-get install openmpi-bin openmpi-common libopenmpi-dev
         sudo apt-get install libhdf5-serial-dev
         sudo apt-get install libeigen3-dev
+        sudo apt-get install libopenblas-dev 
 
         mkdir build;
         cd build;
