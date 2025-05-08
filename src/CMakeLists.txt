@@ -1,6 +1,6 @@
 project(opt-lib CXX)
 
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 3.3 NO_MODULE REQUIRED)
 
 add_library(opt INTERFACE)
 target_include_directories(opt INTERFACE .)
