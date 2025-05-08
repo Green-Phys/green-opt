@@ -19,9 +19,6 @@ jobs:
 
     - name: Build
       run: |
-        printenv
-        pwd
-        whoami
         module load BuildEnv/gcc-12.2.0.lua;
         mkdir build;
         cd build;
