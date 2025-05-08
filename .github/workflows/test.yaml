@@ -20,7 +20,7 @@ jobs:
     - name: Build
       run: |        
         sudo apt-get update
-        sudo apt-get install openmpi
+        sudo apt-get install openmpi-bin openmpi-common libopenmpi-dev
         sudo apt-get install hdf5
 
         mkdir build;
