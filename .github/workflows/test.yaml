@@ -35,7 +35,6 @@ jobs:
       run: |
         cd build;
         ctest -j1;
-        # TODO: add project specific tests
     - name: Run coverage
       run: |
         cd build;
@@ -44,7 +43,7 @@ jobs:
         lcov --remove coverage.info '/opt/ohpc/pub/compiler/*' --output-file coverage.info
         lcov --remove coverage.info '*_deps*' --output-file coverage.info
         lcov --remove coverage.info '*libs*' --output-file coverage.info
-        lcov --list coverage.info
+        lcov --ignore-errors source --list coverage.info
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       env:
