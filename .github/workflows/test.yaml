@@ -39,11 +39,11 @@ jobs:
       run: |
         cd build;
         lcov --capture --directory . --output-file coverage.info;
-        lcov --remove coverage.info '/usr/*' --output-file coverage.info
-        lcov --remove coverage.info '/opt/ohpc/pub/compiler/*' --output-file coverage.info
-        lcov --remove coverage.info '*_deps*' --output-file coverage.info
-        lcov --remove coverage.info '*libs*' --output-file coverage.info
-        lcov --ignore-errors source --list coverage.info
+        lcov --remove coverage.info '/usr/*' --output-file coverage.info;
+        lcov --remove coverage.info '/opt/ohpc/pub/compiler/*' --output-file coverage.info;
+        lcov --remove coverage.info '*_deps*' --output-file coverage.info;
+        lcov --remove coverage.info '*libs*' --output-file coverage.info;
+        lcov --ignore-errors source --list coverage.info;
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
       env:
