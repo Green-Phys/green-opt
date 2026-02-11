@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.18)
+cmake_minimum_required(VERSION 3.27)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 project(opt)
@@ -25,6 +25,9 @@ else ()
 endif ()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+
+# explicitly set cmake policy for find_package imports
+cmake_policy(SET CMP0144 NEW)
 
 include(GreenDeps)
 
