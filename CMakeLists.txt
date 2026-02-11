@@ -26,6 +26,9 @@ endif ()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
+# explicitly set cmake policy for find_package imports
+cmake_policy(SET CMP0144 NEW)
+
 include(GreenDeps)
 
 add_green_dependency(green-utils)
