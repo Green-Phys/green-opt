@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.27)
+cmake_minimum_required(VERSION 3.18)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 project(opt)
@@ -26,8 +26,11 @@ endif ()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 
-# explicitly set cmake policy for find_package imports
-cmake_policy(SET CMP0144 NEW)
+# CMP0144 (CMake >= 3.27): let find_package also honour upper-case <PACKAGENAME>_ROOT,
+# e.g. EIGEN3_ROOT as exported by many HPC environment modules.
+if (POLICY CMP0144)
+    cmake_policy(SET CMP0144 NEW)
+endif ()
 
 include(GreenDeps)
 
