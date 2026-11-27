@@ -266,7 +266,7 @@ namespace green::opt {
      * Compute and print the condition number
      */
     void print_cond() const {
-      Eigen::JacobiSVD svd(_m_B);
+      Eigen::JacobiSVD<MatrixXcd> svd(_m_B);
       double           cond = svd.singularValues()(0) / svd.singularValues()(svd.singularValues().size() - 1);
       if (!utils::context().global_rank && std::abs(cond) > 1e+12) {
         std::cerr << diis_str << "Condition number of the residual overlap matrix is too large: " << cond << std::endl;
@@ -302,7 +302,7 @@ namespace green::opt {
 
       VectorXcd           bb = VectorXcd::Constant(B.cols(), 1.0);
 
-      Eigen::BDCSVD       svd(B, Eigen::ComputeFullU | Eigen::ComputeFullV);
+      Eigen::BDCSVD<MatrixXcd> svd(B, Eigen::ComputeFullU | Eigen::ComputeFullV);
       MatrixXcd           U         = svd.matrixU();
       VectorXcd           sing_vals = svd.singularValues();
       std::vector<double> errors(B.cols());
